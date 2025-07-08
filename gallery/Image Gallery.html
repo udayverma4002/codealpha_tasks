@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<!--  *****   Link To Custom CSS Style Sheet   *****  -->
+	<link rel="stylesheet" type="text/css" href="style.css">
+
+	<!--  *****   Link To Font Awsome Icons   *****  -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Uday,s Image Gallery</title>
+
+</head>
+
+<body>
+	<section class="header-text">
+
+		<header class="section-head">
+			<h1>Uday,s Gallery</h1>
+			<p>Explore our curated collection with smooth animations, hover effects, and filtering.</p>
+		</header>
+
+		<main class="mainContainer">
+
+			<!--  *****  Buttons Section Starts  *****  -->
+			<div class="button-group">
+				<button class="button active" data-filter="*">All</button>
+				<button class="button" data-filter=".car">Car</button>
+				<button class="button" data-filter=".temple">temple</button>
+				<button class="button" data-filter=".logo">Logo</button>
+			</div>
+			<!--  *****  Buttons Section Ends  *****  -->
+
+			<!--  *****  Gallery Section Starts  *****  -->
+			<div class="gallery">
+
+				<!--  *****  Card 1 Starts  *****  -->
+				<div class="item car">
+					<img src="car1.jpg">
+					<span class="image-label">Dodge Challenger</span>
+
+				</div>
+				<!--  *****  Card 1 Ends  *****  -->
+
+				<!--  *****  Card 2 Starts  *****  -->
+				  <div class="item temple">
+					<img src="temple1.jpg">
+					<span class="image-label">Badrinath Dham</span>
+
+				</div>
+
+
+				<!--  *****  Card 2 Ends  *****  -->
+
+				<!--  *****  Card 3 Starts  *****  -->
+				  <div class="item car">
+					<img src="car2.jpg">
+					<span class="image-label">Old Mustang</span>
+
+				</div>
+
+				<!--  *****  Card 3 Ends  *****  -->
+
+				<!--  *****  Card 4 Starts  *****  -->
+				<div class="item temple">
+					<img src="temple2.jpg">
+					<span class="image-label">Kainchi Dham</span>
+
+				</div>
+				<!--  *****  Card 4 Ends  *****  -->
+
+				<!--  *****  Card 5 Starts  *****  -->
+				<div class="item temple">
+					<img src="temple3.jpg">
+					<span class="image-label">Kedarnath</span>
+
+				</div>
+				<!--  *****  Card 5 Ends  *****  -->
+
+				<!--  *****  Card 6 Starts  *****  -->
+				<div class="item logo">
+					<img src="logo1.jpg">
+					<span class="image-label">Starbucks</span>
+
+				</div>
+				<!--  *****  Card 6 Ends  *****  -->
+
+			</div>
+			<!--  *****  Gallery Section Ends  *****  -->
+
+		</main>
+
+		<!-- Lightbox Popup -->
+		<div id="lightbox" class="lightbox">
+			<div class="lightbox-inner">
+				<span class="close">&times;</span>
+				<button class="nav-btn prev" id="prevBtn">&#10094;</button>
+				<img id="lightbox-img" class="lightbox-content" />
+				<button class="nav-btn next" id="nextBtn">&#10095;</button>
+			</div>
+			<div class="lightbox-caption" id="lightbox-caption"></div>
+			<a href="#" target="_blank" id="viewMoreBtn" class="view-more">View More</a>
+		</div>
+	</section>
+
+	<!--   *****   JQuery Link   *****   -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+	<!--   *****   Isotope Filter Link   *****  -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js"></script>
+
+	<script type="text/javascript">
+		var $galleryContainer = $('.gallery').isotope({
+			itemSelector: '.item',
+			layoutMode: 'fitRows'
+		})
+
+		$('.button-group .button').on('click', function () {
+			$('.button-group .button').removeClass('active');
+			$(this).addClass('active');
+
+			var value = $(this).attr('data-filter');
+			$galleryContainer.isotope({
+				filter: value
+			})
+		})
+		const lightbox = document.getElementById('lightbox');
+		const lightboxImg = document.getElementById('lightbox-img');
+		const lightboxCaption = document.getElementById('lightbox-caption');
+		const viewMoreBtn = document.getElementById('viewMoreBtn');
+		const closeBtn = document.querySelector('.close');
+		const prevBtn = document.getElementById('prevBtn');
+		const nextBtn = document.getElementById('nextBtn');
+		const galleryItems = document.querySelectorAll('.gallery .item img');
+
+		let currentIndex = 0;
+
+		//  Custom View More Links Per Image
+		const imageData = [
+			{
+				src: 'car1.jpg',
+				label: 'Dodge Challenger',
+				viewMore: 'https://en.wikipedia.org/wiki/Dodge_Challenger'
+			},
+			{
+				src: 'car2.jpg',
+				label: 'Old Mustang',
+				viewMore: 'https://en.wikipedia.org/wiki/Ford_Mustang_(first_generation)'
+			},
+			{
+				src: 'temple1.jpg',
+				label: 'Kainchi Dham',
+				viewMore: 'https://www.tejomayaresorts.com/the-history-of-kainchi-dham/'
+			},
+			{
+				src: 'temple2.jpg',
+				label: 'Badrinath',
+				viewMore: 'https://en.wikipedia.org/wiki/Badrinath_Temple'
+			},
+			{
+				src: 'temple3.jpg',
+				label: 'Kedarnath',
+				viewMore: 'https://en.wikipedia.org/wiki/Kedarnath_Temple'
+			},
+			{
+				src: 'logo1.jpg',
+				label: 'Starbucks',
+				viewMore: 'https://www.starbucks.com/'
+			}
+		];
+
+		function showLightbox(index) {
+			currentIndex = index;
+			const data = imageData[currentIndex];
+			lightbox.style.display = 'flex';
+			lightboxImg.src = data.src;
+			lightboxCaption.textContent = data.label;
+			viewMoreBtn.href = data.viewMore;
+		}
+
+		galleryItems.forEach((img, index) => {
+			img.addEventListener('click', () => showLightbox(index));
+		});
+
+		nextBtn.addEventListener('click', () => {
+			currentIndex = (currentIndex + 1) % imageData.length;
+			showLightbox(currentIndex);
+		});
+
+		prevBtn.addEventListener('click', () => {
+			currentIndex = (currentIndex - 1 + imageData.length) % imageData.length;
+			showLightbox(currentIndex);
+		});
+
+		closeBtn.addEventListener('click', () => {
+			lightbox.style.display = 'none';
+		});
+
+		document.addEventListener('keydown', (e) => {
+			if (lightbox.style.display === 'flex') {
+				if (e.key === 'Escape') lightbox.style.display = 'none';
+				if (e.key === 'ArrowRight') nextBtn.click();
+				if (e.key === 'ArrowLeft') prevBtn.click();
+			}
+		});
+	</script>
+
+</body>
+
+</html>

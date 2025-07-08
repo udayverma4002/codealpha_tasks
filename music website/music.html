@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Uday,s music - Enhanced Player</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+     <!-- 🎯 Centered Heading -->
+  <div class="container">
+    <h1 class="main-heading">Uday's music library</h1>
+  </div>
+
+    <h3 class="subheading">Enhanced Music Player</h3>
+    <p class="description">(Enjoy your favorite songs with lyrics, playlist, and more!)</p>
+  </div>
+
+    <!-- 🎵 Music Player -->
+
+    
+    <div class="player-wrapper">
+        <div class="music-box">
+            <img id="songImg" class="song-img" src="">
+            <div class="info-panel">
+                <div class="singer-box" id="singer"></div>
+                <div class="song-title" id="songTitle"></div>
+                <input type="range" class="progress-bar" id="progress" value="0">
+                <div class="controls">
+                    <button onclick="prevSong()">⏮</button>
+                    <button onclick="playPause()" id="playPauseBtn">▶️</button>
+                    <button onclick="nextSong()">⏭</button>
+                </div>
+                <div class="volume-control">
+                    <img src="https://cdn-icons-png.flaticon.com/128/7846/7846693.png" alt="Volume Icon" />
+                    <input type="range" class="volume" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+                </div>
+                <div class="extra-buttons">
+                    <button onclick="alert('Connecting Headphones...')">
+                        <img src="https://cdn-icons-png.flaticon.com/512/727/727269.png" alt="Headphones" /> Connect
+                    </button>
+                    <button onclick="toggleFullscreen()">
+                        <img src="https://cdn-icons-png.flaticon.com/512/992/992651.png" alt="Fullscreen" /> Fullscreen
+                    </button>
+                </div>
+                <div class="lyrics" id="lyrics"></div>
+            </div>
+        </div>
+
+        <div class="playlist-box">
+            <h3>🎶 Playlist</h3>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search for a song...">
+            </div>
+            <div id="playlist"></div>
+        </div>
+    </div>
+
+    <!-- Audio Player -->
+    <audio id="audioPlayer"></audio>
+
+    <!-- JavaScript -->
+    <script>
+        const songs = [
+            {
+                name: "Sanam Teri Kasam",
+                singer: "Himesh Reshammiya,Ankit Tiwari,Palak Muchhal",
+                src: "Sanam Teri Kasam.mp3  ",
+                img: "https://i.pinimg.com/736x/1f/2b/64/1f2b649dd87f7d83d34c2f2719bd13f9.jpg",
+                lyrics: "Betahasha dil ne  / Tujhko hi chaaha hai / Har dua mein maine / Tujhko hi maanga hai / Tera jaana jaise ..."
+            },
+            {
+                name: "Wang Da Naap",
+                singer: "Ammy Virk",
+                src: "Wang Da Naap.mp3",
+                img: "https://c.saavncdn.com/633/Wang-Da-Naap-Punjabi-2022-20220422131237-500x500.jpg",
+                lyrics: "Ni main kamm dhandhe saare chhad ke  / Teri wang da lai laan naap / Ni main kamm dhandhe saare chhad ke / Teri wang da lai laan naap / Jo tere dil vich dhadak rahae / Mainu bilkul sundae saaf / Jo tere dil vich dhadak rahae / Mainu bilkul sundae saaf..."
+            },
+            {
+                name: "Tere Mast Mast Do Nain ",
+                singer: "Rahat Fateh Ali Khan",
+                src: "Tere Mast Mast Do Nain.mp3",
+                img: "https://a10.gaanacdn.com/gn_img/albums/YoEWlwa3zX/YoEWlAmbzX/size_m.jpg",
+                lyrics: "Taakte rehte tujhko saanjh savere / Nainon mein haye / Nainon mein haye / Taakte rehte tujhko saanjh savere / Nainon mein bansiya jaise nain yeh tere / Nainon mein bansiya jaise nain yeh tere / Tere mast mast do nain..."
+            },
+            {
+                name: "Mexico",
+                singer: "Karan Aujla",
+                src: "Mexico.mp3",
+                img: "https://c.saavncdn.com/131/Mexico-Punjabi-2021-20240411153326-500x500.jpg",
+                lyrics: "Karan Aujla, Yeah Proof / Put that koka on, baby (Yeah Proof), let's bounce / Koka - koka, ni balliye, paa lai koka, ni balliye / Aaja, Mexico challiye, aaja, Mexico..."
+            },
+            {
+                name: "Teen Baan Ke Dhari",
+                singer: "Chotu Singh Rawna",
+                src: "Teen Baan Ke Dhari.mp3",
+                img: "https://c.saavncdn.com/640/Teen-Baan-Ke-Dhari-Hindi-2023-20231127153413-500x500.jpg",
+                lyrics: "Andhero ki nagri se / kaise main paar jaaun / Shyaam ab lene aa ja 🙏 / hausla haar na jaaun  / Teen baan ke dhaari 🏹/ teeno baan chalao na / Mushkil mein hai daas tera / ab jaldi aao na... "
+            }
+        ];
+
+        const audio = document.getElementById("audioPlayer");
+        const playPauseBtn = document.getElementById("playPauseBtn");
+        const songTitle = document.getElementById("songTitle");
+        const singer = document.getElementById("singer");
+        const songImg = document.getElementById("songImg");
+        const lyricsBox = document.getElementById("lyrics");
+        const progress = document.getElementById("progress");
+        const volumeSlider = document.getElementById("volumeSlider");
+        const playlist = document.getElementById("playlist");
+        const searchInput = document.getElementById("searchInput");
+
+        let currentIndex = 0;
+        let isMuted = false;
+        let previousVolume = 1;
+
+        function loadSong(index) {
+            const song = songs[index];
+            currentIndex = index;
+            audio.src = song.src;
+            songTitle.innerText = song.name;
+            singer.innerText = song.singer;
+            songImg.src = song.img;
+            lyricsBox.innerText = song.lyrics;
+            audio.play();
+            playPauseBtn.innerText = "⏸";
+        }
+
+        function playPause() {
+            if (audio.paused) {
+                audio.play();
+                playPauseBtn.innerText = "⏸";
+            } else {
+                audio.pause();
+                playPauseBtn.innerText = "▶️";
+            }
+        }
+
+        function nextSong() {
+            currentIndex = (currentIndex + 1) % songs.length;
+            loadSong(currentIndex);
+        }
+
+        function prevSong() {
+            currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+            loadSong(currentIndex);
+        }
+
+        audio.addEventListener("timeupdate", () => {
+            progress.value = (audio.currentTime / audio.duration) * 100;
+        });
+
+        progress.addEventListener("input", () => {
+            audio.currentTime = (progress.value / 100) * audio.duration;
+        });
+
+        volumeSlider.addEventListener("input", () => {
+            audio.volume = volumeSlider.value;
+            audio.volume === 0;
+        });
+
+        function toggleFavorite(el) {
+            el.innerText = el.innerText === "❤️" ? "🤍" : "❤️";
+        }
+
+        function renderPlaylist() {
+            const searchValue = searchInput.value.toLowerCase();
+            playlist.innerHTML = songs.map((song, index) => {
+                if (!song.name.toLowerCase().includes(searchValue)) return "";
+                return `
+          <div class="song-item">
+            <div class="song-name">
+              <img class="song-thumb" src="${song.img}" alt="thumb" />
+              ${song.name}
+            </div>
+            <div class="icon-btn" onclick="toggleFavorite(this)">🤍</div>
+            <div class="dropdown">
+              <div class="icon-btn">⋮</div>
+              <div class="dropdown-content">
+                <a href="#" onclick="loadSong(${index})">Play</a>
+                <a href="${song.src}" download>Download</a>
+                <a href="#" onclick="toggleFavorite(this)">Favorite</a>
+              </div>
+            </div>
+          </div>
+        `;
+            }).join('');
+        }
+
+        function toggleFullscreen() {
+            const docElm = document.documentElement;
+            if (!document.fullscreenElement) {
+                docElm.requestFullscreen().catch(err => console.warn(err));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        searchInput.addEventListener("input", renderPlaylist);
+        loadSong(currentIndex);
+        renderPlaylist();
+    </script>
+</body>
+
+</html>
